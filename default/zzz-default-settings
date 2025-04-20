@@ -10,8 +10,8 @@ uci commit argon
 
 # Set NTP
 uci -q batch <<-EOF
-	set system.@system[0].timezone='CST-8'
-	set system.@system[0].zonename='Asia/Shanghai'
+	uci set system.@system[0].timezone='UTC-8'
+	uci set system.@system[0].zonename='Asia/Kuala_Lumpur'
 
 	delete system.ntp.server
 	add_list system.ntp.server='ntp1.aliyun.com'
@@ -29,8 +29,8 @@ sed -i 's/root:::0:99999:7:::/root:$1$V4UetPzk$CYXluq4wUazHjmCDBCqXF.:0:0:99999:
 ln -s /usr/libexec/wget-ssl /usr/bin/
 
 # extra packages
-echo 'src/gz openwrt_extras https://clone.kejizero.online/raw.githubusercontent.com/oppen321/openwrt_extras/main/x86_64/package' >> /etc/opkg/distfeeds.conf
-echo 'src/gz openwrt_helloworld https://clone.kejizero.online/raw.githubusercontent.com/oppen321/openwrt_extras/main/x86_64/helloworld' >> /etc/opkg/distfeeds.conf
+# echo 'src/gz openwrt_extras https://clone.kejizero.online/raw.githubusercontent.com/oppen321/openwrt_extras/main/x86_64/package' >> /etc/opkg/distfeeds.conf
+# echo 'src/gz openwrt_helloworld https://clone.kejizero.online/raw.githubusercontent.com/oppen321/openwrt_extras/main/x86_64/helloworld' >> /etc/opkg/distfeeds.conf
 
 # check_signature
 sed -i 's/^option check_signature/# option check_signature/' /etc/opkg.conf
@@ -75,11 +75,11 @@ if [ -f /etc/config/dockerd ] && [ $(grep -c daocloud.io /etc/config/dockerd) -e
 fi
 
 
-# Smartdns相关设置
+# Smartdns
 uci add smartdns server
 uci set smartdns.@server[0].enabled='1'
 uci set smartdns.@server[0].type='udp'
-uci set smartdns.@server[0].name='清华大学TUNA协会'
+uci set smartdns.@server[0].name='TUNA Association'
 uci set smartdns.@server[0].ip='101.6.6.6'
 uci set smartdns.@server[0].server_group='smartdns-China'
 uci set smartdns.@server[0].blacklist_ip='0'
@@ -191,7 +191,7 @@ uci set smartdns.@server[12].exclude_default_group='0'
 uci set smartdns.@server[12].blacklist_ip='0'
 uci add smartdns server
 uci set smartdns.@server[13].enabled='1'
-uci set smartdns.@server[13].name='谷歌DNS'
+uci set smartdns.@server[13].name='Google DNS'
 uci set smartdns.@server[13].ip='https://dns.google/dns-query'
 uci set smartdns.@server[13].type='https'
 uci set smartdns.@server[13].no_check_certificate='0'
@@ -249,13 +249,12 @@ uci commit smartdns
 /etc/init.d/smartdns restart
 
 ### nikki
-# 设置基础状态
 uci set nikki.status='status'
 
-# 主配置
+# Main configuration
 uci set nikki.config=config
 uci set nikki.config.init='1'
-uci set nikki.config.enabled='0'  # 关闭
+uci set nikki.config.enabled='0'  
 uci set nikki.config.profile='subscription:subscription'
 uci set nikki.config.start_delay='0'
 uci set nikki.config.scheduled_restart='0'
@@ -263,7 +262,7 @@ uci set nikki.config.cron_expression='0 3 * * *'
 uci set nikki.config.test_profile='1'
 uci set nikki.config.fast_reload='1'
 
-# 代理设置
+# proxy settings
 uci set nikki.proxy=proxy
 uci set nikki.proxy.enabled='1'
 uci set nikki.proxy.tcp_mode='redirect'
@@ -281,14 +280,14 @@ uci set nikki.proxy.bypass_china_mainland_ip='0'
 uci set nikki.proxy.proxy_tcp_dport='0-65535'
 uci set nikki.proxy.proxy_udp_dport='0-65535'
 
-# 订阅配置（需替换真实URL）
+# Subscription configuration (replace the real URL)
 uci set nikki.subscription=subscription
-uci set nikki.subscription.name='订阅配置'
-uci set nikki.subscription.url='http://your_real_subscription_url.yaml'  # 请修改
+uci set nikki.subscription.name='Subscription configuration'
+uci set nikki.subscription.url='http://dotycat.com/subs/config.yaml'  # Please modify
 uci set nikki.subscription.user_agent='clash.meta'
 uci set nikki.subscription.prefer='remote'
 
-# 混合配置
+# Mixed configuration
 uci set nikki.mixin=mixin
 uci set nikki.mixin.log_level='warning'
 uci set nikki.mixin.mode='rule'
@@ -330,7 +329,7 @@ uci set nikki.mixin.tcp_concurrent='1'
 uci set nikki.mixin.tcp_keep_alive_idle='600'
 uci set nikki.mixin.tcp_keep_alive_interval='15'
 uci set nikki.mixin.ui_name='Zashboard'
-uci set nikki.mixin.api_secret='123456'  # 请修改
+uci set nikki.mixin.api_secret='123456'  # Please modify
 uci set nikki.mixin.tun_mtu='9000'
 uci set nikki.mixin.tun_gso='1'
 uci set nikki.mixin.tun_gso_max_size='65536'
@@ -353,14 +352,14 @@ uci set nikki.mixin.geoip_dat_url='https://testingcf.jsdelivr.net/gh/Loyalsoldie
 uci set nikki.mixin.geox_auto_update='1'
 uci set nikki.mixin.geox_update_interval='24'
 
-# 环境配置
+# Environment configuration
 uci set nikki.env=env
 uci set nikki.env.disable_safe_path_check='0'
 uci set nikki.env.disable_loopback_detector='0'
 uci set nikki.env.disable_quic_go_gso='0'
 uci set nikki.env.disable_quic_go_ecn='0'
 
-# 路由访问控制（第一组）
+# Routing access control (first group)
 uci set nikki.@router_access_control[0]=router_access_control
 uci set nikki.@router_access_control[0].enabled='1'
 uci add_list nikki.@router_access_control[0].user='dnsmasq'
@@ -385,38 +384,40 @@ uci add_list nikki.@router_access_control[0].cgroup='tailscale'
 uci add_list nikki.@router_access_control[0].cgroup='zerotier'
 uci set nikki.@router_access_control[0].proxy='0'
 
-# 路由访问控制（第二组）
+# Routing access control (second group)
 uci set nikki.@router_access_control[1]=router_access_control
 uci set nikki.@router_access_control[1].enabled='1'
 uci set nikki.@router_access_control[1].proxy='1'
 
-# LAN访问控制
+# LAN Access Control
 uci set nikki.lan_access_control=lan_access_control
 uci set nikki.lan_access_control.enabled='1'
 uci set nikki.lan_access_control.proxy='1'
 
-# 认证配置
+# Authentication configuration
 uci set nikki.authentication=authentication
 uci set nikki.authentication.enabled='1'
-uci set nikki.authentication.username='admin'  # 建议修改
-uci set nikki.authentication.password='your_strong_password'  # 必须修改
+uci set nikki.authentication.username='admin'
+uci set nikki.authentication.password=''
+uci commit nikki
 
-# 域名配置
+
+# Domain name configuration
 uci set nikki.hosts=hosts
 uci set nikki.hosts.enabled='1'
-uci set nikki.hosts.domain_name='*.yourdomain.com'  # 替换为实际域名
+uci set nikki.hosts.domain_name='*.yourdomain.com'  # Replace with the actual domain name
 
-# DNS服务器配置（示例配置第一个）
+# DNS server configuration (example configuration first)
 uci set nikki.@nameserver[0]=nameserver
 uci set nikki.@nameserver[0].enabled='1'
 uci set nikki.@nameserver[0].type='nameserver'
 uci add_list nikki.@nameserver[0].nameserver='223.5.5.5'
 uci add_list nikki.@nameserver[0].nameserver='119.29.29.29'
 
-# 提交所有更改
+# Commit all changes
 uci commit nikki
 
-# 重启服务
+# Restart the service
 /etc/init.d/nikki restart
 
 ### ssrplus
